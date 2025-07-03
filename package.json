@@ -1,0 +1,23 @@
+{
+  "name": "@dumpdotfun-sdk",
+  "version": "1.0.0",
+  "main": "index.js",
+  "description": "Dumpdotfun SDK for developers",
+  "keywords": [
+    "@dumpdotfun/sdk",
+    "@dumpdotfun/sdk-node",
+    "@dumpdotfun/sdk-api"
+  ],
+  "author": "okadev",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.31.1",
+    "@solana/spl-token": "^0.4.13",
+    "@solana/web3.js": "^1.98.2",
+    "bn.js": "^5.2.2",
+    "typescript": "^5.8.3"
+  }
+}
