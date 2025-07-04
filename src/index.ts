@@ -9,16 +9,13 @@ export {
 export {
   globalPda,
   bondingCurvePda,
-  creatorVaultPda,
-  pumpPoolAuthorityPda,
+  dumpPoolAuthorityPda,
   CANONICAL_POOL_INDEX,
-  canonicalPumpPoolPda,
 } from "./pda";
 export {
-  getPumpProgram,
-  PUMP_PROGRAM_ID,
-  PUMP_AMM_PROGRAM_ID,
+  getDumpProgram,
+  DUMP_PROGRAM_ID,
   BONDING_CURVE_NEW_SIZE,
-  PumpSdk,
+  DumpSdk,
 } from "./sdk";
 export { Global, BondingCurve } from "./state";

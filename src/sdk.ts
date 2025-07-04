@@ -28,12 +28,12 @@ export function getDumpProgram(
     connection: Connection,
     programId: PublicKey,
 ): Program<Dumpdotfun> {
-    const pumpIdlAddressOverride = { ...dumpIdl };
+    const dumpIdlAddressOverride = { ...dumpIdl };
 
-    pumpIdlAddressOverride.address = programId.toString();
+    dumpIdlAddressOverride.address = programId.toString();
 
     return new Program(
-        pumpIdlAddressOverride as Dumpdotfun,
+        dumpIdlAddressOverride as Dumpdotfun,
         new AnchorProvider(connection, null as any, {}),
     );
 }
@@ -316,124 +316,5 @@ export class DumpSdk {
 
         return instructions;
     }
-
-    async migrateInstructions({
-        global,
-        mint,
-    }: {
-        global: Global;
-        mint: PublicKey;
-    }): Promise<TransactionInstruction[]> {
-        const instructions: TransactionInstruction[] = [];
-
-        const teamAta = await this.fetchAssociatedUserAccountInfo(mint, global.teamWallet);
-        const index = 1;
-        const indexBN = new BN(index)
-        const globalVault = PublicKey.findProgramAddressSync(
-            [Buffer.from("global")],
-            this.dumpProgram.programId
-        )[0];
-        
-        const pumpswapProgram = new PublicKey("pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA")
-
-        const pool = PublicKey.findProgramAddressSync(
-            [
-                Buffer.from("pool"),
-                indexBN.toArrayLike(Buffer, "le", 2),
-                globalVault.toBytes(),
-                mint.toBytes(),
-                NATIVE_MINT.toBytes()
-            ],
-            pumpswapProgram
-        )[0];
-
-        const poolBaseTokenAccountPDA = getAssociatedTokenAddressSync(
-            mint,
-            pool,
-            true
-        );
-
-        const poolQuoteTokenAccountPDA = getAssociatedTokenAddressSync(
-            NATIVE_MINT,
-            pool,
-            true
-        );
-        instructions.push(createAssociatedTokenAccountIdempotentInstruction(
-            global.teamWallet,
-            teamAta,
-            global.teamWallet,
-            mint
-        ))
-
-        instructions.push(
-            await this.transferFeeInstruction({
-                global,
-                mint
-            }),
-        );
-        instructions.push(
-            createAssociatedTokenAccountIdempotentInstruction(
-                global.teamWallet,
-                poolBaseTokenAccountPDA,
-                global.teamWallet,
-                mint
-            ),
-            createAssociatedTokenAccountIdempotentInstruction(
-                global.teamWallet,
-                poolQuoteTokenAccountPDA,
-                global.teamWallet,
-                NATIVE_MINT
-            ),
-        )
-        instructions.push(
-            await this.migratePumpswapInstruction({
-                global,
-                mint
-            }),
-        );
-        return instructions;
-    }
-
-    private async transferFeeInstruction({
-        global,
-        mint,
-    }: {
-        global: Global;
-        mint: PublicKey;
-    }): Promise<TransactionInstruction> {
-
-        return this.dumpProgram.methods
-            .transferFee()
-            .accounts({
-                coinMint: mint,
-                payer: global.teamWallet,
-                teamWallet: global.teamWallet,
-            })
-            .instruction();
-    }
-
-    private async migratePumpswapInstruction({
-        global,
-        mint,
-    }: {
-        global: Global;
-        mint: PublicKey;
-    }): Promise<TransactionInstruction> {
-
-        const pumpswapProgram = new PublicKey("pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA")
-
-        const index = 1;
-        return this.dumpProgram.methods
-            .migratePumpswap(
-                index
-            )
-            .accounts({
-                teamWallet: global.teamWallet,
-                coinMint: mint,
-                payer: global.teamWallet,
-                wsolMint: NATIVE_MINT,
-                pumpswapProgram,
-            })
-            .instruction();
-    }
+    
 }
